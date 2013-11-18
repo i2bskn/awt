@@ -1,6 +1,8 @@
 # Awt
 
 [![Build Status](https://travis-ci.org/i2bskn/awt.png)](https://travis-ci.org/i2bskn/awt)
+[![Coverage Status](https://coveralls.io/repos/i2bskn/awt/badge.png)](https://coveralls.io/r/i2bskn/awt)
+[![Code Climate](https://codeclimate.com/github/i2bskn/awt.png)](https://codeclimate.com/github/i2bskn/awt)
 
 Automatic working tool.
 
