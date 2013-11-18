@@ -13,6 +13,7 @@ SimpleCov.start do
 end
 
 require "awt"
+require "awt/dsl"
 
 support_files = File.join(File.expand_path("..", __FILE__), "support/*.rb")
 Dir[support_files].each {|f| require f}

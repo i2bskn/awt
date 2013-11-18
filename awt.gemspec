@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Awt::VERSION
   spec.authors       = ["i2bskn"]
   spec.email         = ["i2bskn@gmail.com"]
-  spec.description   = %q{Automatic working tool}
-  spec.summary       = %q{Automatic working tool}
+  spec.description   = %q{Awt is cli tool for system administration.}
+  spec.summary       = %q{Awt is cli tool for system administration.}
   spec.homepage      = "https://github.com/i2bskn/awt"
   spec.license       = "MIT"
 
