@@ -18,6 +18,44 @@ describe Awt::CLI do
   end
 
   describe "#execute" do
+    before do
+      Awt::Server.any_instance.stub(:run)
+      Awt::CLI.any_instance.stub(:load)
+      cli.instance_eval do
+        task :example do
+          run "something"
+        end
+      end
+    end
+
+    after do
+      $AWT_TASKS.clear
+      $AWT_TARGETS.clear
+    end
+
+    it "should call #register_targets" do
+      Awt::CLI.any_instance.should_receive(:register_targets).with(["host1", "host2"])
+      cli.execute
+    end
+
+    it "should throw exception if @task_file is nil" do
+      cli.instance_eval {@task_file = nil}
+      expect {
+        cli.execute
+        }.to raise_error
+    end
+
+    it "should load task file" do
+      Awt::CLI.any_instance.should_receive(:load)
+      cli.execute
+    end
+
+    it "should call Awt::Task#exec" do
+      mock = double("Awt::Task mock").as_null_object
+      mock.should_receive(:exec)
+      $AWT_TASKS.store(:example, mock)
+      cli.execute
+    end
   end
 
   describe "#parse_opt" do
@@ -47,6 +85,8 @@ describe Awt::CLI do
   end
 
   describe "#register_targets" do
+    before {$AWT_TARGETS.clear}
+
     it "should add targets" do
       cli.send(:register_targets, cli.instance_eval{@hosts})
       expect($AWT_TARGETS.size).to eq(2)
@@ -54,5 +94,18 @@ describe Awt::CLI do
   end
 
   describe ".#start" do
+    it "should call Awt::CLI#execute" do
+      Awt::CLI.any_instance.should_receive(:execute)
+      Awt::CLI.start
+    end
+
+    it "should print error message if raise error" do
+      Awt::CLI.any_instance.should_receive(:execute).and_raise("error")
+      expect(
+        capture(:stdout){
+          Awt::CLI.start
+        }.chomp
+      ).to eq("error")
+    end
   end
 end
