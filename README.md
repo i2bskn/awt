@@ -1,5 +1,7 @@
 # Awt
 
+[![Build Status](https://travis-ci.org/i2bskn/awt.png)](https://travis-ci.org/i2bskn/awt)
+
 Automatic working tool.
 
 ## Installation
