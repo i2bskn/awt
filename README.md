@@ -1,5 +1,6 @@
 # Awt
 
+[![Gem Version](https://badge.fury.io/rb/awt.png)](http://badge.fury.io/rb/awt)
 [![Build Status](https://travis-ci.org/i2bskn/awt.png)](https://travis-ci.org/i2bskn/awt)
 [![Coverage Status](https://coveralls.io/repos/i2bskn/awt/badge.png)](https://coveralls.io/r/i2bskn/awt)
 [![Code Climate](https://codeclimate.com/github/i2bskn/awt.png)](https://codeclimate.com/github/i2bskn/awt)
@@ -43,6 +44,8 @@ server "hostname", user: "awt", port: 22, key: "/path/to/id_rsa"
 
 task :task_name do
   run "do something"
+  put "/path/to/local/file", "/path/to/remote/file"
+  get "/path/to/remote/file", "/path/to/local/file"
 end
 ```
 

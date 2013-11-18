@@ -1,4 +1,5 @@
 require "net/ssh"
+require "net/scp"
 
 require "awt/printer"
 require "awt/server"

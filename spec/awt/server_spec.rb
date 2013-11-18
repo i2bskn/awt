@@ -1,10 +1,14 @@
 require "spec_helper"
 
 describe Awt::Server do
+  let(:server) {Awt::Server.new}
+  let(:ssh) {double("Net::SSH mock").as_null_object}
+  let(:scp) {double("Net::SCP mock").as_null_object}
+  let(:local) {"/local/file"}
+  let(:remote) {"/remote/file"}
+
   describe "#initialize" do
     context "with default params" do
-      let(:server) {Awt::Server.new}
-
       it "should set default host" do
         expect(server.host).to eq("localhost")
       end
@@ -50,9 +54,6 @@ describe Awt::Server do
   end
 
   describe "#run" do
-    let(:server) {Awt::Server.new}
-    let(:ssh) {double("Net::SSH mock").as_null_object}
-
     before do
       Net::SSH.stub(:start).and_yield(ssh)
       Awt::Printer.any_instance.stub(:print_run)
@@ -66,13 +67,69 @@ describe Awt::Server do
       Awt::Printer.any_instance.should_receive(:print_out)
     end
 
-    it "should call Net::SSH::Connection::Session#exec" do
+    it "should call #exec! of Net::SSH" do
       ssh.should_receive(:exec!)
     end
 
-    it "should re-set host of Printer" do
+    it "should call #reset_printer_host" do
+      Awt::Server.any_instance.should_receive(:reset_printer_host)
+    end
+  end
+
+  describe "#put" do
+    before do
+      ssh.stub(:scp).and_return(scp)
+      Net::SSH.stub(:start).and_yield(ssh)
+      Awt::Printer.any_instance.stub(:print_upload)
+    end
+
+    after {server.put(local, remote)}
+
+    it "should call Awt::Printer#print_*" do
+      Awt::Printer.any_instance.should_receive(:print_upload)
+    end
+
+    it "should call #upload! of Net::SCP" do
+      scp.should_receive(:upload!)
+    end
+
+    it "should call #reset_printer_host" do
+      Awt::Server.any_instance.should_receive(:reset_printer_host)
+    end
+  end
+
+  describe "#get" do
+    before do
+      ssh.stub(:scp).and_return(scp)
+      Net::SSH.stub(:start).and_yield(ssh)
+      Awt::Printer.any_instance.stub(:print_download)
+    end
+
+    after {server.get(remote, local)}
+
+    it "should call Awt::Printer#print_*" do
+      Awt::Printer.any_instance.should_receive(:print_download)
+    end
+
+    it "should call #download! of Net::SCP" do
+      scp.should_receive(:download!)
+    end
+
+    it "should call #reset_printer_host" do
+      Awt::Server.any_instance.should_receive(:reset_printer_host)
+    end
+  end
+
+  describe "#reset_printer_host" do
+    after {server.send(:reset_printer_host)}
+
+    it "should re-set host of Printer if changed host" do
       Awt::Printer.any_instance.should_receive(:host=)
       server.host = "example.com"
+    end
+
+    it "should not re-set host of Printer" do
+      Awt::Printer.any_instance.should_not_receive(:host=)
     end
   end
 end

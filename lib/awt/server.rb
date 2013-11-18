@@ -10,12 +10,33 @@ module Awt
     end
 
     def run(cmd)
-      @printer.host = @host if @printer.host != @host
+      reset_printer_host
       Net::SSH.start(@host, @user, @options) do |ssh|
         @printer.print_run cmd
         out = ssh.exec!(cmd)
         @printer.print_out out
       end
+    end
+
+    def put(local, remote)
+      reset_printer_host
+      Net::SSH.start(@host, @user, @options) do |ssh|
+        @printer.print_upload local
+        ssh.scp.upload! local, remote
+      end
+    end
+
+    def get(remote, local)
+      reset_printer_host
+      Net::SSH.start(@host, @user, @options) do |ssh|
+        @printer.print_download remote
+        ssh.scp.download! remote, local
+      end
+    end
+
+    private
+    def reset_printer_host
+      @printer.host = @host if @printer.host != @host
     end
   end
 end
