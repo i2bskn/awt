@@ -49,6 +49,19 @@ task :task_name do
 end
 ```
 
+`run` is returns a result object.  
+Result object with a exit-status, etc.
+
+```ruby
+if run("cat /etc/centos-release").status == 0
+  puts "Hello CentOS"
+end
+
+if run("uname -a").data.chomp == "Linux"
+  puts "Hello Linux"
+end
+```
+
 #### Execute
 
 Awt task executable as follows:

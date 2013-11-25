@@ -54,21 +54,39 @@ describe Awt::Server do
   end
 
   describe "#run" do
+    let(:channel) {double.as_null_object}
+
     before do
+      channel.stub(:exec).with("example").and_yield(double, double)
+      ssh.stub(:open_channel).and_yield(channel)
       Net::SSH.stub(:start).and_yield(ssh)
       Awt::Printer.any_instance.stub(:print_run)
       Awt::Printer.any_instance.stub(:print_out)
+      Awt::Printer.any_instance.stub(:print_ext)
     end
 
     after {server.run("example")}
 
     it "should call Awt::Printer#print_*" do
       Awt::Printer.any_instance.should_receive(:print_run)
+    end
+
+    it "should call #on_data" do
+      channel.should_receive(:on_data).and_yield(double, double)
       Awt::Printer.any_instance.should_receive(:print_out)
     end
 
-    it "should call #exec! of Net::SSH" do
-      ssh.should_receive(:exec!)
+    it "should call #on_extended_data" do
+      channel.should_receive(:on_extended_data).and_yield(double, double, double)
+      Awt::Printer.any_instance.should_receive(:print_ext)
+    end
+
+    it "should call #on_request" do
+      channel.should_receive(:on_request).with("exit-status").and_yield(double, double.as_null_object)
+    end
+
+    it "should call #loop" do
+      ssh.should_receive(:loop)
     end
 
     it "should call #reset_printer_host" do

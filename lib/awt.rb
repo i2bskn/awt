@@ -1,3 +1,4 @@
+require "ostruct"
 require "net/ssh"
 require "net/scp"
 

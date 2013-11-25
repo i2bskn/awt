@@ -11,11 +11,23 @@ module Awt
 
     def run(cmd)
       reset_printer_host
+      result = OpenStruct.new
+
       Net::SSH.start(@host, @user, @options) do |ssh|
         @printer.print_run cmd
-        out = ssh.exec!(cmd)
-        @printer.print_out out
+        ssh.open_channel do |channel|
+          channel.exec cmd do |ch, success|
+            channel.on_data {|ch,data| result.data = data}
+            channel.on_extended_data {|ch,type,data| result.extended_data = data}
+            channel.on_request("exit-status") {|ch,data| result.status = data.read_long}
+          end
+        end
+        ssh.loop
       end
+
+      @printer.print_out result.data if result.data
+      @printer.print_ext result.extended_data if result.extended_data
+      result
     end
 
     def put(local, remote)
