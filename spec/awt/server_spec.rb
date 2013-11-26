@@ -53,6 +53,13 @@ describe Awt::Server do
     end
   end
 
+  describe "#with_env" do
+    it "should call instance methods" do
+      server.should_receive(:run)
+      server.with_env(key: :value) {run "example"}
+    end
+  end
+
   describe "#run" do
     let(:channel) {double.as_null_object}
 

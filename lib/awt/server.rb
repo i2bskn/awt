@@ -1,6 +1,6 @@
 module Awt
   class Server
-    attr_accessor :host, :user, :options
+    attr_accessor :host, :user, :options, :envs
 
     def initialize(host: "localhost", port: 22, user: nil, key: "~/.ssh/id_rsa")
       @host = host
@@ -9,8 +9,17 @@ module Awt
       @printer = Printer.new(@host)
     end
 
+    def with_env(envs, &block)
+      env = []
+      envs.each {|k,v| env << "export #{k.to_s.upcase}=\"#{v}\""}
+      @envs = env.join(";") unless env.empty?
+      self.instance_eval &block
+      @envs = nil
+    end
+
     def run(cmd)
       reset_printer_host
+      cmd = "#{@envs};#{cmd}" if @envs
       result = OpenStruct.new
 
       Net::SSH.start(@host, @user, @options) do |ssh|

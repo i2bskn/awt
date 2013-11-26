@@ -62,6 +62,15 @@ if run("uname -a").data.chomp == "Linux"
 end
 ```
 
+Using the `with_env` method if you want to use the environment variable.  
+Key is applied upcase it is converted to String.
+
+```ruby
+with_env key: "value" do
+  run "echo $KEY"
+end
+```
+
 #### Execute
 
 Awt task executable as follows:
